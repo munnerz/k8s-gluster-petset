@@ -1,5 +1,7 @@
 # GlusterFS PetSet
 
+** NOTE: THIS IS AN EXTREMELY PRE-ALPHA, NOT-BETA DEFINITELY NOT PRODUCTION READY RELEASE! **
+
 This contains manifests and info for running GlusterFS server as a petset under Kubernetes
 
 ## Requirements
