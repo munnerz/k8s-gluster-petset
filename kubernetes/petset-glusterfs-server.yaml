@@ -1,0 +1,89 @@
+apiVersion: apps/v1alpha1
+kind: PetSet
+metadata:
+  name: glusterfs-server
+  namespace: kube-system
+spec:
+  serviceName: "glusterfs"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: glusterfs
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+        scheduler.alpha.kubernetes.io/affinity: >
+          {
+            "podAntiAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": [
+                {
+                  "labelSelector": {
+                    "matchExpressions": [
+                      {
+                        "key": "app",
+                        "operator": "In",
+                        "values": ["glusterfs"]
+                      }
+                    ]
+                  },
+                  "topologyKey": "kubernetes.io/hostname"
+                }
+              ]
+            }
+          }
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: glusterfs
+        image: munnerz/glusterfs-server
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: brick
+          mountPath: /brick
+  volumeClaimTemplates:
+  - metadata:
+      name: brick
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      selector:
+        matchLabels:
+          type: "host-path"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glusterfs
+  namespace: kube-system
+  labels:
+    app: glusterfs
+spec:
+  clusterIP: None
+  ports:
+  - name: daemon
+    port: 24007
+  - name: management
+    port: 24008
+  selector:
+    app: glusterfs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glusterfs-cluster
+  namespace: kube-system
+  labels:
+    app: glusterfs
+spec:
+  type: ClusterIP
+  ports:
+  - name: daemon
+    port: 24007
+  - name: management
+    port: 24008
+  selector:
+    app: glusterfs

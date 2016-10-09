@@ -1,0 +1,26 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: heketi
+  namespace: kube-system
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: heketi
+      labels:
+        name: heketi
+    spec:
+      containers:
+      - name: heketi
+        image: munnerz/heketi:v2.0.6
+        args:
+        - --config
+        - /etc/heketi/heketi.json
+        volumeMounts:
+        - name: etc-heketi
+          mountPath: /etc/heketi
+      volumes:
+      - name: etc-heketi
+        configMap:
+          name: heketi
