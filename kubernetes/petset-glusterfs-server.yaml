@@ -32,7 +32,6 @@ spec:
             }
           }
     spec:
-      terminationGracePeriodSeconds: 0
       containers:
       - name: glusterfs
         image: munnerz/glusterfs-server
